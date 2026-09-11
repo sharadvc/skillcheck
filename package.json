@@ -43,7 +43,7 @@
     "METHODOLOGY.md"
   ],
   "scripts": {
-    "build": "rm -rf dist && tsc -p tsconfig.json && chmod +x dist/bin/skillcheck.js",
+    "build": "node scripts/build.mjs",
     "m0": "tsx packages/cli/bin/skillcheck.ts m0",
     "site:build": "next build packages/site",
     "test": "vitest run",
