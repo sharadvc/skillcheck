@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 import type { LlmClient } from '../src/adapters/types.js';
 import { JsonCache } from '../src/cache.js';
 import { generateTasks } from '../src/generate.js';
-import { testNvidiaConfig } from './helpers.js';
+import { testProviderConfig } from './helpers.js';
 
 describe('generateTasks', () => {
   it('retries when the generator returns malformed JSON', async () => {
@@ -25,7 +25,7 @@ describe('generateTasks', () => {
       }
     } as unknown as LlmClient;
 
-    const tasks = await generateTasks({ domain: 'retry testing', count: 1 }, testNvidiaConfig, client, new JsonCache(cacheDir));
+    const tasks = await generateTasks({ domain: 'retry testing', count: 1 }, testProviderConfig, client, new JsonCache(cacheDir));
 
     expect(calls).toBe(2);
     expect(tasks).toHaveLength(1);
@@ -48,7 +48,7 @@ describe('generateTasks', () => {
       }
     } as unknown as LlmClient;
 
-    const tasks = await generateTasks({ domain: 'short batches', count: 3 }, testNvidiaConfig, client, new JsonCache(cacheDir));
+    const tasks = await generateTasks({ domain: 'short batches', count: 3 }, testProviderConfig, client, new JsonCache(cacheDir));
 
     expect(calls).toBe(3); // tried three times for the full count
     expect(tasks).toHaveLength(1); // then settled for what it got

@@ -2,7 +2,7 @@ import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { loadNvidiaConfig } from '../src/env.js';
+import { loadProviderConfig } from '../src/env.js';
 
 const originalEnv = { ...process.env };
 
@@ -31,7 +31,7 @@ function resetProviderEnv(): void {
   process.env.SKILLCHECK_CONFIG_DIR = mkdtempSync(path.join(tmpdir(), 'skillcheck-config-test-'));
 }
 
-describe('loadNvidiaConfig', () => {
+describe('loadProviderConfig', () => {
   afterEach(() => {
     process.env = { ...originalEnv };
   });
@@ -40,7 +40,7 @@ describe('loadNvidiaConfig', () => {
     resetProviderEnv();
     process.env.NVIDIA_API_KEY = 'nvidia-key';
 
-    const config = loadNvidiaConfig();
+    const config = loadProviderConfig();
 
     expect(config.apiKey).toBe('nvidia-key');
     expect(config.baseUrl).toBe('https://integrate.api.nvidia.com/v1');
@@ -54,7 +54,7 @@ describe('loadNvidiaConfig', () => {
     process.env.SKILLCHECK_API_URL = 'https://proxy.example.com/v1';
     process.env.SKILLCHECK_MODEL = 'proxy/default-model';
 
-    const config = loadNvidiaConfig();
+    const config = loadProviderConfig();
 
     expect(config.apiKey).toBe('skillcheck-cloud');
     expect(config.baseUrl).toBe('https://proxy.example.com/v1');
@@ -68,7 +68,7 @@ describe('loadNvidiaConfig', () => {
     process.env.SKILLCHECK_API_URL = 'https://proxy.example.com/v1';
     process.env.SKILLCHECK_TOKEN = 'proxy-user-token';
 
-    const config = loadNvidiaConfig();
+    const config = loadProviderConfig();
 
     expect(config.apiKey).toBe('proxy-user-token');
   });
@@ -79,7 +79,7 @@ describe('loadNvidiaConfig', () => {
     resetProviderEnv();
     process.env.SKILLCHECK_TOKEN = 'chk_live_token';
 
-    const config = loadNvidiaConfig();
+    const config = loadProviderConfig();
 
     expect(config.apiKey).toBe('chk_live_token');
     expect(config.baseUrl).toBe('https://www.skillcheck.page/api');
@@ -91,7 +91,7 @@ describe('loadNvidiaConfig', () => {
     process.env.SKILLCHECK_API_URL = 'https://proxy.example.com/v1';
     process.env.SKILLCHECK_TOKEN = 'chk_live_token';
 
-    const config = loadNvidiaConfig();
+    const config = loadProviderConfig();
 
     expect(config.apiKey).toBe('nvidia-key');
     expect(config.baseUrl).toBe('https://integrate.api.nvidia.com/v1');
@@ -100,8 +100,8 @@ describe('loadNvidiaConfig', () => {
   it('uses an actionable setup error when no provider is configured', () => {
     resetProviderEnv();
 
-    expect(() => loadNvidiaConfig()).toThrow(/Skillcheck Cloud is not connected/);
-    expect(() => loadNvidiaConfig()).toThrow(/skillcheck setup/);
-    expect(() => loadNvidiaConfig()).toThrow(/SKILLCHECK_TOKEN/);
+    expect(() => loadProviderConfig()).toThrow(/Skillcheck Cloud is not connected/);
+    expect(() => loadProviderConfig()).toThrow(/skillcheck setup/);
+    expect(() => loadProviderConfig()).toThrow(/SKILLCHECK_TOKEN/);
   });
 });

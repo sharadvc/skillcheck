@@ -1,8 +1,9 @@
-import type { NvidiaConfig } from '../src/env.js';
+import type { ProviderConfig } from '../src/adapters/types.js';
 
 export const PASS_MARKER = 'SKILL_PASS_MARKER';
 
-export const testNvidiaConfig: NvidiaConfig = {
+export const testProviderConfig: ProviderConfig = {
+  provider: 'nvidia',
   apiKey: 'test-key',
   baseUrl: 'https://integrate.api.nvidia.com/v1',
   timeoutMs: 120000,
@@ -14,7 +15,7 @@ export const testNvidiaConfig: NvidiaConfig = {
   graderModel: 'meta/llama-3.1-70b-instruct'
 };
 
-export class FakeNvidiaNimClient {
+export class FakeOpenAiCompatClient {
   constructor(
     public config: unknown,
     public options?: unknown

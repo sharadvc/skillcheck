@@ -6,7 +6,7 @@ import type { LlmClient } from '../src/adapters/types.js';
 import { JsonCache } from '../src/cache.js';
 import { runTrials } from '../src/run.js';
 import type { GeneratedTask, NormalizedSkill } from '../src/types.js';
-import { testNvidiaConfig } from './helpers.js';
+import { testProviderConfig } from './helpers.js';
 
 const skill: NormalizedSkill = {
   name: 'Example Skill',
@@ -42,7 +42,7 @@ describe('runTrials trial independence', () => {
       }
     } as unknown as LlmClient;
 
-    const outputs = await runTrials(skill, tasks, 3, testNvidiaConfig, client, new JsonCache(cacheDir));
+    const outputs = await runTrials(skill, tasks, 3, testProviderConfig, client, new JsonCache(cacheDir));
 
     expect(calls).toBe(6); // 1 task x 3 trials x 2 arms
     expect(outputs).toHaveLength(6);
@@ -72,8 +72,8 @@ describe('runTrials trial independence', () => {
     } as unknown as LlmClient;
 
     const cache = new JsonCache(cacheDir);
-    const first = await runTrials(skill, tasks, 3, testNvidiaConfig, client, cache);
-    const second = await runTrials(skill, tasks, 3, testNvidiaConfig, client, cache);
+    const first = await runTrials(skill, tasks, 3, testProviderConfig, client, cache);
+    const second = await runTrials(skill, tasks, 3, testProviderConfig, client, cache);
 
     expect(calls).toBe(6); // second run is fully cached
     expect(second.map((output) => output.output)).toEqual(first.map((output) => output.output));

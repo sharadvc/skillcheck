@@ -7,18 +7,6 @@ dotenv.config();
 
 const DEFAULT_MODEL = 'openai/gpt-oss-120b';
 
-export interface NvidiaConfig {
-  apiKey: string;
-  baseUrl: string;
-  timeoutMs: number;
-  requestDelayMs: number;
-  maxAttempts: number;
-  maxRetryDelayMs: number;
-  generatorModel: string;
-  graderModel: string;
-  runnerModel: string;
-}
-
 function readEnv(name: string): string | undefined {
   const value = process.env[name]?.trim();
   return value || undefined;
@@ -157,9 +145,3 @@ export function loadProviderConfig(): ResolvedProviderConfig {
   };
 }
 
-// NVIDIA-shaped view of the provider config for the NIM client and the m0
-// gate. A passthrough: every field loadProviderConfig returns is already
-// guaranteed, so no re-defaulting here.
-export function loadNvidiaConfig(): NvidiaConfig {
-  return loadProviderConfig();
-}
