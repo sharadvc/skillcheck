@@ -1,6 +1,5 @@
 import { AnthropicClient } from './anthropic.js';
 import { GeminiClient } from './gemini.js';
-import { NvidiaNimClient } from './nvidia-nim.js';
 import { OpenAiCompatClient } from './openai-compat.js';
 import type { LlmClient, ModelInfo, ProviderConfig, ProviderType } from './types.js';
 
@@ -148,22 +147,7 @@ export function createLlmClient(config: ProviderConfig, options: { defaultHeader
     });
   }
 
-  if (config.provider === 'nvidia' || config.provider === 'cloud') {
-    return new NvidiaNimClient(
-      {
-        apiKey: config.apiKey,
-        baseUrl,
-        timeoutMs: config.timeoutMs ?? 120000,
-        requestDelayMs: config.requestDelayMs ?? 750,
-        maxAttempts: config.maxAttempts ?? 8,
-        maxRetryDelayMs: config.maxRetryDelayMs ?? 60000,
-        generatorModel: config.generatorModel,
-        graderModel: config.graderModel,
-        runnerModel: config.runnerModel
-      },
-      options
-    );
-  }
+  const sendChatTemplateKwargs = config.provider === 'nvidia' || config.provider === 'cloud';
 
   return new OpenAiCompatClient(
     {
@@ -173,7 +157,7 @@ export function createLlmClient(config: ProviderConfig, options: { defaultHeader
       requestDelayMs: config.requestDelayMs,
       maxAttempts: config.maxAttempts,
       maxRetryDelayMs: config.maxRetryDelayMs,
-      sendChatTemplateKwargs: false
+      sendChatTemplateKwargs
     },
     options
   );

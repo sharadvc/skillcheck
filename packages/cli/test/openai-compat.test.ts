@@ -1,5 +1,4 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { NvidiaConfig } from '../src/env.js';
 
 // Drive the retry/serialize/extract logic of the adapter by mocking the OpenAI
 // SDK underneath it. `createImpl` is swapped per test to simulate successes,
@@ -21,18 +20,15 @@ vi.mock('openai', () => ({
   }
 }));
 
-const { NvidiaNimClient } = await import('../src/adapters/nvidia-nim.js');
+const { OpenAiCompatClient } = await import('../src/adapters/openai-compat.js');
 
-const baseConfig: NvidiaConfig = {
+const baseConfig = {
   apiKey: 'test',
   baseUrl: 'https://example.test/v1',
   timeoutMs: 1000,
   requestDelayMs: 0,
   maxAttempts: 4,
-  maxRetryDelayMs: 1, // keep backoff sleeps sub-millisecond in tests
-  generatorModel: 'g',
-  graderModel: 'gr',
-  runnerModel: 'r'
+  maxRetryDelayMs: 1 // keep backoff sleeps sub-millisecond in tests
 };
 
 function completion(message: Record<string, unknown>, usage?: Record<string, number>) {
@@ -46,7 +42,7 @@ const request = {
   maxTokens: 100
 };
 
-describe('NvidiaNimClient', () => {
+describe('OpenAiCompatClient', () => {
   beforeEach(() => {
     createCalls = 0;
     createImpl = async () => completion({ content: 'ok' });
@@ -56,7 +52,7 @@ describe('NvidiaNimClient', () => {
   it('returns content, model, and normalized usage on success', async () => {
     createImpl = async () =>
       completion({ content: 'hello' }, { prompt_tokens: 11, completion_tokens: 7, total_tokens: 18 });
-    const client = new NvidiaNimClient(baseConfig);
+    const client = new OpenAiCompatClient(baseConfig);
     const res = await client.complete(request);
     expect(res.content).toBe('hello');
     expect(res.model).toBe('fake-model');
@@ -66,11 +62,11 @@ describe('NvidiaNimClient', () => {
 
   it('falls back to reasoning_content, then to a joined content array', async () => {
     createImpl = async () => completion({ reasoning_content: 'thinking out loud' });
-    expect((await new NvidiaNimClient(baseConfig).complete(request)).content).toBe('thinking out loud');
+    expect((await new OpenAiCompatClient(baseConfig).complete(request)).content).toBe('thinking out loud');
 
     createImpl = async () =>
       completion({ content: [{ type: 'text', text: 'a' }, { type: 'text', text: 'b' }] });
-    expect((await new NvidiaNimClient(baseConfig).complete(request)).content).toBe('ab');
+    expect((await new OpenAiCompatClient(baseConfig).complete(request)).content).toBe('ab');
   });
 
   it('retries a 429 and then succeeds', async () => {
@@ -82,7 +78,7 @@ describe('NvidiaNimClient', () => {
       }
       return completion({ content: 'after retry' });
     };
-    const res = await new NvidiaNimClient(baseConfig).complete(request);
+    const res = await new OpenAiCompatClient(baseConfig).complete(request);
     expect(res.content).toBe('after retry');
     expect(createCalls).toBe(2);
   });
@@ -91,7 +87,7 @@ describe('NvidiaNimClient', () => {
     createImpl = async () => {
       throw Object.assign(new Error('unavailable'), { status: 503 });
     };
-    await expect(new NvidiaNimClient(baseConfig).complete(request)).rejects.toThrow(/unavailable/);
+    await expect(new OpenAiCompatClient(baseConfig).complete(request)).rejects.toThrow(/unavailable/);
     expect(createCalls).toBe(baseConfig.maxAttempts);
   });
 
@@ -99,12 +95,32 @@ describe('NvidiaNimClient', () => {
     createImpl = async () => {
       throw Object.assign(new Error('bad request'), { status: 400 });
     };
-    await expect(new NvidiaNimClient(baseConfig).complete(request)).rejects.toThrow(/bad request/);
+    await expect(new OpenAiCompatClient(baseConfig).complete(request)).rejects.toThrow(/bad request/);
     expect(createCalls).toBe(1);
   });
 
   it('throws a descriptive error when the message carries no text', async () => {
     createImpl = async () => completion({ tool_calls: [] });
-    await expect(new NvidiaNimClient(baseConfig).complete(request)).rejects.toThrow(/did not include text content/);
+    await expect(new OpenAiCompatClient(baseConfig).complete(request)).rejects.toThrow(/did not include text content/);
+  });
+
+  it('sends chat_template_kwargs when enabled', async () => {
+    let capturedBody: Record<string, unknown> | undefined;
+    createImpl = async (body) => {
+      capturedBody = body as Record<string, unknown>;
+      return completion({ content: 'ok' });
+    };
+    await new OpenAiCompatClient({ ...baseConfig, sendChatTemplateKwargs: true }).complete(request);
+    expect(capturedBody?.chat_template_kwargs).toEqual({ enable_thinking: false });
+  });
+
+  it('omits chat_template_kwargs when disabled', async () => {
+    let capturedBody: Record<string, unknown> | undefined;
+    createImpl = async (body) => {
+      capturedBody = body as Record<string, unknown>;
+      return completion({ content: 'ok' });
+    };
+    await new OpenAiCompatClient({ ...baseConfig, sendChatTemplateKwargs: false }).complete(request);
+    expect(capturedBody).not.toHaveProperty('chat_template_kwargs');
   });
 });

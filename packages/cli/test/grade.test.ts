@@ -6,7 +6,7 @@ import type { LlmClient } from '../src/adapters/types.js';
 import { JsonCache } from '../src/cache.js';
 import { gradeOutputs } from '../src/grade.js';
 import type { GeneratedTask, TrialOutput } from '../src/types.js';
-import { testNvidiaConfig } from './helpers.js';
+import { testProviderConfig } from './helpers.js';
 
 const sampleTasks: GeneratedTask[] = [
   {
@@ -48,7 +48,7 @@ describe('gradeOutputs', () => {
       }
     } as unknown as LlmClient;
 
-    const graded = await gradeOutputs(sampleTasks, sampleOutputs(), testNvidiaConfig, client, new JsonCache(cacheDir));
+    const graded = await gradeOutputs(sampleTasks, sampleOutputs(), testProviderConfig, client, new JsonCache(cacheDir));
 
     expect(calls).toBe(2);
     expect(graded[0]?.pass).toBe(true);
@@ -64,7 +64,7 @@ describe('gradeOutputs', () => {
       })
     } as unknown as LlmClient;
 
-    const graded = await gradeOutputs(sampleTasks, sampleOutputs(), testNvidiaConfig, client, new JsonCache(cacheDir));
+    const graded = await gradeOutputs(sampleTasks, sampleOutputs(), testProviderConfig, client, new JsonCache(cacheDir));
 
     expect(graded[0]?.pass).toBe(true);
     expect(graded[0]?.reason).toContain('non-json grader response');
@@ -83,7 +83,7 @@ describe('gradeOutputs', () => {
     const graded = await gradeOutputs(
       sampleTasks,
       sampleOutputs('sha256:test-negated', 'An unrelated answer.'),
-      testNvidiaConfig,
+      testProviderConfig,
       client,
       new JsonCache(cacheDir)
     );
@@ -104,7 +104,7 @@ describe('gradeOutputs', () => {
     const graded = await gradeOutputs(
       sampleTasks,
       sampleOutputs('sha256:test-score-marker', 'A correct answer.'),
-      testNvidiaConfig,
+      testProviderConfig,
       client,
       new JsonCache(cacheDir)
     );

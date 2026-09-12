@@ -4,9 +4,9 @@ import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { evalSkill } from '../src/eval.js';
 
-vi.mock('../src/adapters/nvidia-nim.js', async () => {
-  const { FakeNvidiaNimClient } = await import('./helpers.js');
-  return { NvidiaNimClient: FakeNvidiaNimClient };
+vi.mock('../src/adapters/openai-compat.js', async () => {
+  const { FakeOpenAiCompatClient } = await import('./helpers.js');
+  return { OpenAiCompatClient: FakeOpenAiCompatClient };
 });
 
 describe('eval --explain payload', () => {
