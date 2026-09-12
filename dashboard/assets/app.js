@@ -47,7 +47,7 @@ function renderCommands() {
   // The hosted URL is baked into the CLI, so users only need their key. Setting
   // SKILLCHECK_TOKEN skips the prompt and goes straight to the file picker.
   $('commandsText').textContent =
-    'npm install -g @sx4im/skillcheck\n' +
+    'npm install -g @sx4im/skillcheck@latest\n' +
     'export SKILLCHECK_TOKEN=' + state.fullKey + '\n' +
     'skillcheck';
 }

@@ -277,11 +277,11 @@ export function printUpdateApplied(latest: string): void {
 }
 
 export function printUpdateSkipped(latest: string): void {
-  console.log(`${paint.dim('Skipped. Update any time with')} ${paint.bold('npm install -g @sx4im/skillcheck')}${paint.dim(`  (v${latest})`)}\n`);
+  console.log(`${paint.dim('Skipped. Update any time with')} ${paint.bold('npm install -g @sx4im/skillcheck@latest')}${paint.dim(`  (v${latest})`)}\n`);
 }
 
 export function printUpdateFailed(): void {
-  console.log(`${paint.warn('Could not update automatically.')} ${paint.dim('Run')} ${paint.bold('npm install -g @sx4im/skillcheck')} ${paint.dim('yourself.')}\n`);
+  console.log(`${paint.warn('Could not update automatically.')} ${paint.dim('Run')} ${paint.bold('npm install -g @sx4im/skillcheck@latest')} ${paint.dim('yourself.')}\n`);
 }
 
 export function printLogout(result: { removed: boolean; envOverride: boolean; path: string }): void {

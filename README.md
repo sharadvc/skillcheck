@@ -74,10 +74,10 @@ $ skillcheck
 ## Install
 
 ```bash
-npm install -g @sx4im/skillcheck
+npm install -g @sx4im/skillcheck@latest
 
 # or run it without installing:
-npx @sx4im/skillcheck
+npx @sx4im/skillcheck@latest
 ```
 
 Requires **Node.js 20+**. Works on Linux, macOS, and Windows.
