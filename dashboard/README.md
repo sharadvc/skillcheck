@@ -28,8 +28,7 @@ The signed-in dashboard (`app.html`) shows a hand-maintained changelog card so u
 see new CLI features without leaving the app. It's static markup (no build step) —
 when the CLI ships a release, add an entry at the top of the `<ul class="changelog">`
 list and keep it in sync with the root [`CHANGELOG.md`](../CHANGELOG.md). Latest:
-**v0.10.0 — matrix crash fixed, `verify` honors your configured provider, multi-line
-YAML skill descriptions parse, result JSON schema deduplicated.**
+**v0.11.0 — POSIX `--option=value` support, NVIDIA adapter consolidated into OpenAiCompatClient, typed evaluation result contract, cross-platform Windows build.**
 
 ## Quick start
 

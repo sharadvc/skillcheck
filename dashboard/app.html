@@ -105,39 +105,20 @@
           <p class="muted" style="margin-top:8px">Update any time with <code>npm install -g @sx4im/skillcheck</code>.</p>
           <ul class="changelog" style="margin-top:20px">
             <li>
-              <div class="cl-head"><span class="badge badge-pro">v0.10.0</span> <span class="fine">2026-08-16</span></div>
-              <p class="cl-title">Matrix fixed, verify honors your provider, multi-line skill descriptions</p>
-              <p><code>skillcheck matrix</code> no longer crashes rendering its table and now asks for <code>--models</code> up front on providers that can't resolve the default list. <code>skillcheck verify</code> re-runs through your configured provider instead of always NVIDIA NIM. Skills with multi-line YAML descriptions (<code>&gt;</code> / <code>|</code>) parse correctly, and the <code>--json</code> result schema dropped its duplicate keys.</p>
+              <div class="cl-head"><span class="badge badge-pro">v0.11.0</span> <span class="fine">2026-09-12</span></div>
+              <p class="cl-title">Inline --option=value arguments, cross-platform build, typed result cards</p>
+              <p>CLI commands now accept standard <code>--option=value</code> arguments (e.g. <code>--tasks=5</code>, <code>--trials=3</code>). Build scripts are fully cross-platform with native Windows shell support. Consolidated NVIDIA NIM into unified OpenAI-compatible client, and strongly typed result card rendering.</p>
               <div class="code cl-code"><span>npm install -g @sx4im/skillcheck@latest</span></div>
             </li>
             <li>
-              <div class="cl-head"><span class="badge badge-pro">v0.9.0</span> <span class="fine">2026-07-23</span></div>
+              <div class="cl-head"><span class="badge badge-outline">v0.10.0</span> <span class="fine">2026-08-16</span></div>
+              <p class="cl-title">Matrix fixed, verify honors your provider, multi-line skill descriptions</p>
+              <p><code>skillcheck matrix</code> no longer crashes rendering its table and now asks for <code>--models</code> up front on providers that can't resolve the default list. <code>skillcheck verify</code> re-runs through your configured provider instead of always NVIDIA NIM. Skills with multi-line YAML descriptions (<code>&gt;</code> / <code>|</code>) parse correctly, and the <code>--json</code> result schema dropped its duplicate keys.</p>
+            </li>
+            <li>
+              <div class="cl-head"><span class="badge badge-outline">v0.9.0</span> <span class="fine">2026-07-23</span></div>
               <p class="cl-title">Trial concurrency &amp; multi-model benchmark matrix</p>
               <p>Trial execution now runs with zero-dependency async pool concurrency (<code>--concurrency N</code>), speeding up evaluation runs by 60–75%. Added <code>skillcheck matrix &lt;path&gt;</code> command to benchmark skills across multiple models side-by-side in a single run.</p>
-              <div class="code cl-code"><span>skillcheck matrix ./SKILL.md --models gpt-4o,claude-3-5-sonnet,gemini-1.5-pro</span></div>
-            </li>
-            <li>
-              <div class="cl-head"><span class="badge badge-outline">v0.8.0</span> <span class="fine">2026-07-23</span></div>
-              <p class="cl-title">Bring Your Own Key (BYOK) multi-provider support</p>
-              <p>Direct mode now supports OpenAI, Anthropic, Google Gemini, Groq, Mistral AI, OpenRouter, and NVIDIA NIM with live model verification during <code>skillcheck setup</code> and per-role model overrides (<code>OPENAI_RUNNER_MODEL</code>, etc.).</p>
-              <div class="code cl-code"><span>skillcheck setup</span></div>
-            </li>
-            <li>
-              <div class="cl-head"><span class="badge badge-outline">v0.7.1</span> <span class="fine">2026-06-16</span></div>
-              <p class="cl-title">Smoother interactive runs</p>
-              <p>Running <code>skillcheck check &lt;file&gt;</code> now asks how thorough to be (Quick / Standard / Thorough) instead of guessing, and after the result it offers the per-task breakdown — no need to remember <code>--explain</code>. The progress bar is more precise, too.</p>
-              <div class="code cl-code"><span>skillcheck check ./SKILL.md</span></div>
-            </li>
-            <li>
-              <div class="cl-head"><span class="badge badge-outline">v0.7.0</span> <span class="fine">2026-06-16</span></div>
-              <p class="cl-title"><code>--explain</code> — per-task breakdown</p>
-              <p>See <em>why</em> a verdict landed: with/without pass rates for every task, the change, and a contrasting example model output from each arm — printed under the result card and in <code>--json</code> output. It reuses the run's outputs, so it costs no extra runs.</p>
-              <div class="code cl-code"><span>skillcheck check ./SKILL.md --explain</span></div>
-            </li>
-            <li>
-              <div class="cl-head"><span class="badge badge-outline">v0.6.0</span> <span class="fine">2026-06-16</span></div>
-              <p class="cl-title">Friendlier help &amp; production hardening</p>
-              <p><code>skillcheck &lt;command&gt; --help</code> now prints usage from anywhere, plus a full test, coverage, and release pipeline behind the scenes.</p>
             </li>
           </ul>
         </div>

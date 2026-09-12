@@ -1,6 +1,6 @@
 {
   "name": "@sx4im/skillcheck",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "description": "Controlled A/B tests for agent SKILL.md files: blind grading, bootstrap confidence intervals, HELPS/PLACEBO/HARMS - effect size, not schema validation.",
   "type": "module",
   "license": "MIT",

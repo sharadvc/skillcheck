@@ -6,6 +6,20 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-09-12
+
+### Added
+
+- Support standard `--option=value` arguments alongside space-separated options across all commands (e.g. `--tasks=5`, `--trials=3`, `--output=result.json`, and preserving equals signs in values/paths).
+- Zero-dependency cross-platform build script (`scripts/build.mjs`) replacing Unix-specific `rm -rf` / `chmod` shell pipelines, enabling native `npm run build` on Windows default shells (`cmd.exe` / PowerShell).
+- Windows CI smoke test job validating build and binary execution on `windows-latest`.
+
+### Changed
+
+- Consolidated NVIDIA NIM provider execution into `OpenAiCompatClient` with `sendChatTemplateKwargs`, eliminating the single-implementation `NvidiaNimClient` wrapper and redundant `NvidiaConfig` types.
+- Typed result card formatting directly against the `EvalResult` contract, removing defensive `asRecord` object guards and loose runtime fallbacks.
+- Tightened landing page hero heading to *"Does your skill actually help?"* for improved punchiness and cleaner 2-line layout.
+
 ## [0.10.0] - 2026-08-16
 
 ### Fixed
