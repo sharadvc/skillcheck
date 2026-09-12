@@ -52,6 +52,22 @@ jobs:
           help_out="$(node dist/bin/skillcheck.js --help)"
           grep -q "Usage" <<< "$help_out"
 
+  windows-build:
+    name: Windows build
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build
+      - run: node dist/bin/skillcheck.js --version
+      - run: node dist/bin/skillcheck.js --help
+
   package:
     name: Package validation
     runs-on: ubuntu-latest
