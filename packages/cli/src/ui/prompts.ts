@@ -180,19 +180,21 @@ function effortMenuLines(selected: number, eyebrow: string): string[] {
   return lines;
 }
 
-interface MenuSelectionState {
-  selected: number;
-}
-
-async function runMenuSelectionLoop(
+export async function runMenuSelectionLoop(
   itemCount: number,
-  state: MenuSelectionState,
-  draw: () => void,
+  initialIndex: number,
+  render: (selected: number) => string[],
   options?: {
     cancelOnQ?: boolean;
     onInput?: (input: string) => number | undefined;
   }
-): Promise<void> {
+): Promise<number> {
+  let selected = initialIndex;
+  let painted = false;
+  const draw = () => {
+    painted = drawLines(render(selected), painted);
+  };
+
   await withRawMode(async () => {
     draw();
     for (;;) {
@@ -204,18 +206,18 @@ async function runMenuSelectionLoop(
         throw new CancelledError('Selection cancelled.');
       }
       if (key.name === 'up' || input === 'k') {
-        state.selected = wrapIndex(state.selected, -1, itemCount);
+        selected = wrapIndex(selected, -1, itemCount);
         draw();
         continue;
       }
       if (key.name === 'down' || input === 'j') {
-        state.selected = wrapIndex(state.selected, 1, itemCount);
+        selected = wrapIndex(selected, 1, itemCount);
         draw();
         continue;
       }
       const jump = options?.onInput?.(input);
       if (jump !== undefined) {
-        state.selected = jump;
+        selected = jump;
         break;
       }
       if (key.name === 'return') {
@@ -223,6 +225,8 @@ async function runMenuSelectionLoop(
       }
     }
   });
+
+  return selected;
 }
 
 export async function selectEffort(eyebrow = 'Step 2 of 2'): Promise<EffortChoice> {
@@ -231,22 +235,21 @@ export async function selectEffort(eyebrow = 'Step 2 of 2'): Promise<EffortChoic
     return effortChoice(EFFORT_LEVELS[defaultIndex]!);
   }
 
-  const state: MenuSelectionState = { selected: defaultIndex };
-  let painted = false;
-  const draw = () => {
-    painted = drawLines(effortMenuLines(state.selected, eyebrow), painted);
-  };
-
-  await runMenuSelectionLoop(EFFORT_LEVELS.length, state, draw, {
-    onInput: (input) => {
-      const jump = EFFORT_LEVELS.findIndex((level) => level.key === input);
-      return jump === -1 ? undefined : jump;
+  const selected = await runMenuSelectionLoop(
+    EFFORT_LEVELS.length,
+    defaultIndex,
+    (index) => effortMenuLines(index, eyebrow),
+    {
+      onInput: (input) => {
+        const jump = EFFORT_LEVELS.findIndex((level) => level.key === input);
+        return jump === -1 ? undefined : jump;
+      }
     }
-  });
+  );
 
-  const chosen = EFFORT_LEVELS[state.selected]!;
+  const chosen = EFFORT_LEVELS[selected]!;
   const choice = effortChoice(chosen);
-  process.stdout.write(`\x1b[${effortMenuLines(state.selected, eyebrow).length}A\x1b[0J`);
+  process.stdout.write(`\x1b[${effortMenuLines(selected, eyebrow).length}A\x1b[0J`);
   const scope = `${chosen.tasks} tasks × ${chosen.trials} trial${chosen.trials > 1 ? 's' : ''}`;
   console.log(`  ${paint.ok(SYM.tick)} ${paint.bold('Effort')}      ${chosen.name} ${paint.dim(`${SYM.dot} ${scope}`)} ${paint.accent(`[${choice.estimate}]`)}\n`);
   return choice;
@@ -268,10 +271,7 @@ export async function selectMenuOption<T = string>(
     return options[0]!.value;
   }
 
-  const state: MenuSelectionState = { selected: 0 };
-  let painted = false;
-
-  const renderLines = (): string[] => {
+  const renderLines = (selected: number): string[] => {
     const lines: string[] = [];
     lines.push(`  ${paint.accent(SYM.diamond)} ${paint.bold(title)}`);
     if (subtitle) {
@@ -280,7 +280,7 @@ export async function selectMenuOption<T = string>(
     lines.push('');
 
     const maxLines = 12;
-    const window = visibleWindow(options, state.selected, maxLines);
+    const window = visibleWindow(options, selected, maxLines);
     const offset = window.offset;
     const visible = window.items;
 
@@ -290,7 +290,7 @@ export async function selectMenuOption<T = string>(
 
     for (const [index, option] of visible.entries()) {
       const realIndex = offset + index;
-      const active = realIndex === state.selected;
+      const active = realIndex === selected;
       const pointer = active ? paint.accent(SYM.pointer) : ' ';
       const name = active ? paint.bold(option.name) : paint.dim(option.name);
       const blurb = option.blurb ? ` ${paint.dim(`(${option.blurb})`)}` : '';
@@ -307,15 +307,22 @@ export async function selectMenuOption<T = string>(
     return lines;
   };
 
-  const draw = () => {
-    painted = drawLines(renderLines(), painted);
-  };
+  const selected = await runMenuSelectionLoop(
+    options.length,
+    0,
+    renderLines,
+    {
+      cancelOnQ: true,
+      onInput: (input) => {
+        const jump = options.findIndex((opt) => opt.key === input);
+        return jump === -1 ? undefined : jump;
+      }
+    }
+  );
 
-  await runMenuSelectionLoop(options.length, state, draw, { cancelOnQ: true });
-
-  const lines = renderLines();
+  const lines = renderLines(selected);
   process.stdout.write(`\x1b[${lines.length}A\x1b[0J`);
-  const chosen = options[state.selected]!;
+  const chosen = options[selected]!;
   console.log(`  ${paint.ok(SYM.tick)} ${paint.bold(title)}  ${chosen.name}\n`);
   return chosen.value;
 }
